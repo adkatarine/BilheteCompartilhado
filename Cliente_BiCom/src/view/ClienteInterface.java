@@ -37,31 +37,10 @@ public class ClienteInterface {
         System.exit(0);
     }
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws IOException, RemoteException, NotBoundException, FileNotFoundException, ClassNotFoundException {
-        
-        
-            Registry registry = null;
-            Registry registryTrecho = null;
-            Usuario usuario = null;
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-            int porta;
-            String[] mensagem;
-            int opcoesUsuario;
-            String dados;
-            System.out.println("Digite a porta da Companhia Aerea em que deseja se conectar:");
-            System.out.println("[Porta 1888] Companhia Aerea A - Regiões Norte e Nordeste."); //SENDO FEITA
-            System.out.println("[Porta 1889] Companhia Aerea B - Regiões Contro-Oeste.");
-            System.out.println("[Porta 1890] Companhia Aerea B - Regiões Sudeste e Sul.");
-
-            do{
-                    dados = bufferedReader.readLine();
-                    porta = Integer.parseInt(dados);
-            }while(porta!=1888 && porta!=1889 && porta!=1890);
-
-            if(porta==1888){
+    public static Registry[] conectarServidores(int porta) throws RemoteException{
+        Registry registry = null;
+        Registry registryTrecho = null;
+        if(porta==1888){
                 try{
                 registry = LocateRegistry.getRegistry(porta);
                 registryTrecho = LocateRegistry.getRegistry(porta);
@@ -83,13 +62,75 @@ public class ClienteInterface {
             } catch(RemoteException e){
                 e.printStackTrace();
                 }
-            }
+            } Registry[] r = new Registry[2];
+              r[0] = registry;
+              r[1] = registryTrecho;
+              return r;
+    }
+    
+    public static Registry[] trocarServidor(String companhia) throws RemoteException{
+        if(companhia.equalsIgnoreCase("CompanhiaA")) {
+            System.out.println("CompanhiaA");
+            return conectarServidores(1888);
+        } else if(companhia.equalsIgnoreCase("CompanhiaB")){
+            System.out.println("CompanhiaB");
+            return conectarServidores(1889);
+        } else{
+            System.out.println("CompanhiaC");
+            return conectarServidores(1890);
+        }
+    } 
+    
+      
+    public static Object[] iniciarController(Registry registry, Registry registryTrecho) throws RemoteException, IOException, NotBoundException, FileNotFoundException, ClassNotFoundException{
+        C_Usuario interfaceUsuario = (C_Usuario) registry.lookup("CompanhiaAerea");
+        C_Trechos interfaceTrechos = (C_Trechos) registryTrecho.lookup("CompanhiaAereaA");
+        ControllerUsuario controllerUsuario = new ControllerUsuario(interfaceUsuario);
+        ControllerTrechos controllerTrechos = new ControllerTrechos(interfaceTrechos);
+        
+        Object[] obj = new Object[2];
+        obj[0] = controllerUsuario;
+        obj[1] = controllerTrechos;
+        return obj;
+    }
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws IOException, RemoteException, NotBoundException, FileNotFoundException, ClassNotFoundException {
+        
+        
+            Registry registry = null;
+            Registry registryTrecho = null;
+            Registry[ ] rAux = new Registry[2];
+            ControllerUsuario controllerUsuario;
+            ControllerTrechos controllerTrechos;
+            Object[] obj = new Object[2];
+            Usuario usuario = null;
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+            int porta;
+            String[] mensagem;
+            int opcoesUsuario;
+            String dados;
+            
+            System.out.println("Digite a porta da Companhia Aerea em que deseja se conectar:");
+            System.out.println("[Porta 1888] Companhia Aerea A - Regiões Norte e Nordeste.");
+            System.out.println("[Porta 1889] Companhia Aerea B - Regiões Contro-Oeste.");
+            System.out.println("[Porta 1890] Companhia Aerea B - Regiões Sudeste e Sul.");
+
+            do{
+                dados = bufferedReader.readLine();
+                porta = Integer.parseInt(dados);
+            }while(porta!=1888 && porta!=1889 && porta!=1890);
+
+            rAux = conectarServidores(porta);
+            registry = rAux[0];
+            registryTrecho = rAux[1];
 
             try{
-                C_Usuario interfaceUsuario = (C_Usuario) registry.lookup("CompanhiaAerea");
-                C_Trechos interfaceTrechos = (C_Trechos) registryTrecho.lookup("CompanhiaAereaA");
-                ControllerUsuario controllerUsuario = new ControllerUsuario(interfaceUsuario);
-                ControllerTrechos controllerTrechos = new ControllerTrechos(interfaceTrechos);
+                obj = iniciarController(registry, registryTrecho);
+                controllerUsuario = (ControllerUsuario)obj[0];
+                controllerTrechos = (ControllerTrechos)obj[1];
+
                 do{
                     System.out.println("********** MENU **********");
                     System.out.println("Digite a opção que desejar:");
@@ -148,9 +189,16 @@ public class ClienteInterface {
                                         System.out.println("Opção incorreta. Digite novamente, por favor.");
                                     }
                                 }while(porta <0 && porta>arrayT.size()+1);
-                                Trecho c = arrayT.get(porta);
-                                System.out.println(c.getLocalPartida());
-                                controllerTrechos.addTrecho(usuario, arrayT.get(porta));
+                                Trecho t = arrayT.get(porta);
+                                controllerTrechos.addTrecho(usuario, t);
+                                
+                                rAux = trocarServidor(t.getIDCOMPRA());
+                                registry = rAux[0];
+                                registryTrecho = rAux[1];
+                                
+                                obj = iniciarController(registry, registryTrecho);
+                                controllerUsuario = (ControllerUsuario)obj[0];
+                                controllerTrechos = (ControllerTrechos)obj[1];
                             }
 
                         }while(opcoesUsuario!=02); //DO WHILE que retorna para a opção de trechos ou menu.

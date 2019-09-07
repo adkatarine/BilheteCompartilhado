@@ -25,7 +25,7 @@ public class Passagem implements Serializable{
         this.statusCompra = false;
         this.valorTotalPassagem = 0;
     }
-
+    
     public LinkedList<Trecho> getTrechos() {
         return trechos;
     }

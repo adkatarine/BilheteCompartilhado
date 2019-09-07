@@ -69,14 +69,23 @@ public class ControllerTrechos extends UnicastRemoteObject implements C_Trechos{
     @Override
     public void addTrecho(Usuario usuario, Trecho trecho){
         System.out.println("AAAAA");
-        Passagem passagem = usuario.getPassagens().getLast();
-        System.out.println("BBB");
-        if(!passagem.isStatusCompra()){
+        if(!usuario.getPassagens().isEmpty()){
+            System.out.println("bbbbbbbbbb");
+            Passagem passagem = usuario.getPassagens().getLast();
+            if(!passagem.isStatusCompra()){
             passagem.addTrecho(trecho);
+            System.out.println("1 if");
+            } else{
+                Passagem passagemAux = new Passagem();
+                passagemAux.addTrecho(trecho);
+                usuario.addPassagem(passagem);
+                System.out.println("1 else");
+            }
         } else{
             Passagem passagemAux = new Passagem();
             passagemAux.addTrecho(trecho);
-            usuario.addPassagem(passagem);
+            usuario.addPassagem(passagemAux);
+            System.out.println("2 else");
         }
         System.out.println("Reserva feita: " + trecho.getLocalPartida() + " - " + trecho.getLocalChegada());
     }

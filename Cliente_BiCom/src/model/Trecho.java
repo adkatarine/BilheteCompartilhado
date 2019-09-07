@@ -15,17 +15,19 @@ public class Trecho implements Serializable{
     private String localChegada; // local de chegada do avião
     private int quantAssentos; // quantidade de assentos totais para este voo
     private String ID; // ID que identificará de qual companhia aerea um trecho pertence: CompanhiaA, CompanhiaB ou CompanhiaC
+    private String IDCOMPRA; // ID que identificará de qual companhia aerea o trecho de cegada pertence: CompanhiaA, CompanhiaB ou CompanhiaC
     private float valorTrecho; // valor da compra de um trecho
 
     /**
      * 
      * Contrutor. Nele, todos os atributos são iniciados.
      */
-    public Trecho(String localPartida, String localChegada, int quantAssentos, String ID, float valorTrecho) {
+    public Trecho(String localPartida, String localChegada, int quantAssentos, String ID, String IDCOMPRA, float valorTrecho) {
         this.localPartida = localPartida;
         this.localChegada = localChegada;
         this.quantAssentos = quantAssentos;
         this.ID = ID;
+        this.IDCOMPRA = IDCOMPRA;
         this.valorTrecho = valorTrecho;
     }
 
@@ -63,6 +65,14 @@ public class Trecho implements Serializable{
         this.ID = ID;
     }
 
+    public String getIDCOMPRA() {
+        return IDCOMPRA;
+    }
+
+    public void setIDCOMPRA(String IDCOMPRA) {
+        this.IDCOMPRA = IDCOMPRA;
+    }
+    
     public float getValorTrecho() {
         return valorTrecho;
     }

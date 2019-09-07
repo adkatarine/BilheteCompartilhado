@@ -148,7 +148,7 @@ public class TrechosProntos implements Serializable{
                 this.trecho = new Trecho("Sergipe", "Mato Grosso", 50, "CompanhiaA", "CompanhiaB", 200);
                 this.trechos.add(trecho);
                 
-                
+                System.out.println("CompanhiaA");
                 break;
             case 1889:
                 this.trecho = new Trecho("Goiás", "Acre", 50, "CompanhiaB", "CompanhiaA", 200);
@@ -179,6 +179,7 @@ public class TrechosProntos implements Serializable{
                 this.trecho = new Trecho("Mato Grosso", "Sergipe", 50, "CompanhiaB", "CompanhiaA", 200);
                 this.trechos.add(trecho);
                 
+                System.out.println("CompanhiaB");
                 break;
             default:
                 this.trecho = new Trecho("Espírito Santo", "Amapá", 50, "CompanhiaC", "CompanhiaA", 200);
@@ -222,6 +223,7 @@ public class TrechosProntos implements Serializable{
                 this.trecho = new Trecho("Rio Grande do Sul", "Rio de Janeiro", 50, "CompanhiaC", "CompanhiaC", 200);
                 this.trechos.add(trecho);
                 
+                System.out.println("CompanhiaC");
                 break;
         }
         
