@@ -136,8 +136,8 @@ public class ClienteInterface {
                     System.out.println("Digite a opção que desejar:");
                     System.out.println("[1] - Fazer cadastro.");
                     System.out.println("[2] - Fazer login.");
-                    System.out.println("[3] - Finalizar conexão.");
-                    System.out.println("[4] - Fazer troca de Companhia Aerea.");
+                    System.out.println("[3] - Ver passagens compradas.");
+                    System.out.println("[4] - Finalizar conexão.");
 
                     dados = bufferedReader.readLine();
                     opcoesUsuario = Integer.parseInt(dados);
@@ -155,6 +155,40 @@ public class ClienteInterface {
                             opcoesUsuario=1;
                             break;
                         case 3:
+                            System.out.println("Digite a opção que desejar:");
+                            System.out.println("[1] - Ver última passagem adquirida.");
+                            System.out.println("[2] - Ver todas as passagens adquiridas.");
+                            
+                            dados = bufferedReader.readLine();
+                            opcoesUsuario = Integer.parseInt(dados);
+                            Iterator iterator;
+                            
+                            if(opcoesUsuario == 1){
+                                iterator = usuario.getPassagens().getLast().getTrechos().iterator();
+                                System.out.println("PASSAGEM AEREA");
+                                System.out.println("");
+                                System.out.println("Nome: " + usuario.getNome());
+                                while(iterator.hasNext()){
+                                    Trecho trecho = (Trecho) iterator.next();
+                                    System.out.println("TRECHO: " + trecho.getLocalPartida() + " -> " + trecho.getLocalChegada());
+                                } System.out.println("");
+                            } else{
+                                Iterator iteratorP = usuario.getPassagens().iterator();
+                                int aux = 1;
+                                while(iteratorP.hasNext()){
+                                    System.out.println("************** " + aux + "ª PASSAGEM AEREA **************");
+                                    iterator = usuario.getPassagens().getLast().getTrechos().iterator();
+                                    System.out.println("");
+                                    System.out.println("Nome: " + usuario.getNome());
+                                    aux++;
+                                    while(iterator.hasNext()){
+                                        Trecho trecho = (Trecho) iterator.next();
+                                        System.out.println("TRECHO: " + trecho.getLocalPartida() + " --> " + trecho.getLocalChegada());
+                                    } System.out.println(""); System.out.println("");
+                                }
+                            }
+                            break;
+                        case 4:
                             finalizarPrograma();
                             break;
                        
@@ -162,12 +196,12 @@ public class ClienteInterface {
                     do{
                             System.out.println("Digite a opção que desejar: ");
                             System.out.println("[01] - Ver trechos.");
-                            System.out.println("[02] - Voltar ao menu.");
-
+                            //System.out.println("[02] - Voltar ao menu.");
+                            System.out.println("[02] - Finalizar compra.");
                             dados = bufferedReader.readLine();
                             opcoesUsuario = Integer.parseInt(dados);
 
-                            if(opcoesUsuario == 1){
+                            if(opcoesUsuario == 01){
                                 System.out.println("TRECHOS DISPONÍVEIS PARA VIAGEM:");
                                 ArrayList<Trecho> arrayT = controllerTrechos.trechosDisponíveis();
                                 
@@ -190,7 +224,7 @@ public class ClienteInterface {
                                     }
                                 }while(porta <0 && porta>arrayT.size()+1);
                                 Trecho t = arrayT.get(porta);
-                                controllerTrechos.addTrecho(usuario, t);
+                                usuario.setPassagens(controllerTrechos.addTrecho(usuario, t).getPassagens());
                                 
                                 rAux = trocarServidor(t.getIDCOMPRA());
                                 registry = rAux[0];
@@ -199,10 +233,14 @@ public class ClienteInterface {
                                 obj = iniciarController(registry, registryTrecho);
                                 controllerUsuario = (ControllerUsuario)obj[0];
                                 controllerTrechos = (ControllerTrechos)obj[1];
+                            } else{
+                                System.out.println("Sua compra foi finalizada com sucesso!");
+                                opcoesUsuario = 2;
                             }
-
-                        }while(opcoesUsuario!=02); //DO WHILE que retorna para a opção de trechos ou menu.
+                            System.out.println("PAROU AQUI");
+                        }while(opcoesUsuario==01); //DO WHILE que retorna para a opção de trechos ou menu.
                     
+                    System.out.println("PAROU AQUI 2");
                 }while(opcoesUsuario == 2); //DO WHILE que retorna o usuário ao menu.
             //}while(opcoesUsuario == 4);
         } catch(RemoteException e){

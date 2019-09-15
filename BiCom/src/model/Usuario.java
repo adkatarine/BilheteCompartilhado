@@ -82,5 +82,6 @@ public class Usuario implements Serializable{
     
     public void addPassagem(Passagem passagem){
         this.passagens.add(passagem);
+        System.out.println("ADD");
     }
 }

@@ -38,9 +38,9 @@ public class ControllerTrechos extends UnicastRemoteObject implements C_Trechos{
     }
 
     @Override
-    public void addTrecho(Usuario usuario, Trecho trecho) throws RemoteException {
+    public Usuario addTrecho(Usuario usuario, Trecho trecho) throws RemoteException {
         System.out.println("CCCC");
-        this.cTrechos.addTrecho(usuario, trecho);
+        return this.cTrechos.addTrecho(usuario, trecho);
     }
     
 }

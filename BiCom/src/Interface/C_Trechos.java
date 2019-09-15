@@ -19,5 +19,5 @@ import model.Usuario;
 public interface C_Trechos extends Remote{
     
     public ArrayList<Trecho> trechosDisponíveis() throws RemoteException;
-    public void addTrecho(Usuario usuario, Trecho trecho) throws RemoteException;
+    public Usuario addTrecho(Usuario usuario, Trecho trecho) throws RemoteException;
 }

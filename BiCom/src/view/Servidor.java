@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -26,16 +27,26 @@ import util.*;
  */
 public class Servidor implements Serializable {
 
+    /*public static void conectarServidor(int porta) throws RemoteException, NotBoundException{
+        Registry registry = LocateRegistry.getRegistry(porta);
+        Registry registryTrecho = LocateRegistry.getRegistry(porta);
+        
+        C_Usuario interfaceUsuario = (C_Usuario) registry.lookup("CompanhiaAerea");
+        C_Trechos interfaceTrechos = (C_Trechos) registryTrecho.lookup("CompanhiaAereaA");
+        ControllerUsuario controllerUsuario = new ControllerUsuario(interfaceUsuario);
+        ControllerTrechos controllerTrechos = new ControllerTrechos(interfaceTrechos);
+    }*/
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, FileNotFoundException, ClassNotFoundException, AlreadyBoundException {
-        try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             int porta;
             String companhia;
             String dados;
-
+            
+        try {
             System.out.println("Digite sua porta de Companhia Aerea:");
             System.out.println("[Porta 1888] Companhia Aerea A - Regiões Norte e Nordeste.");
             System.out.println("[Porta 1889] Companhia Aerea B - Regiões Contro-Oeste.");
