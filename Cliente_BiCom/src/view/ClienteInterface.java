@@ -19,6 +19,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Iterator;
+import model.Passagem;
 import model.Trecho;
 import model.Usuario;
 
@@ -136,8 +137,9 @@ public class ClienteInterface {
                     System.out.println("Digite a opção que desejar:");
                     System.out.println("[1] - Fazer cadastro.");
                     System.out.println("[2] - Fazer login.");
-                    System.out.println("[3] - Ver passagens compradas.");
-                    System.out.println("[4] - Finalizar conexão.");
+                    System.out.println("[3] - Comprar passagem.");
+                    System.out.println("[4] - Ver passagens compradas.");
+                    System.out.println("[5] - Finalizar conexão.");
 
                     dados = bufferedReader.readLine();
                     opcoesUsuario = Integer.parseInt(dados);
@@ -154,10 +156,10 @@ public class ClienteInterface {
                             usuario = controllerUsuario.loginUsuario(mensagem[2], mensagem[1]);
                             opcoesUsuario=1;
                             break;
-                        case 3:
+                        case 4:
                             System.out.println("Digite a opção que desejar:");
-                            System.out.println("[1] - Ver última passagem adquirida.");
-                            System.out.println("[2] - Ver todas as passagens adquiridas.");
+                            System.out.println("[01] - Ver última passagem adquirida.");
+                            System.out.println("[02] - Ver todas as passagens adquiridas.");
                             
                             dados = bufferedReader.readLine();
                             opcoesUsuario = Integer.parseInt(dados);
@@ -176,24 +178,29 @@ public class ClienteInterface {
                                 Iterator iteratorP = usuario.getPassagens().iterator();
                                 int aux = 1;
                                 while(iteratorP.hasNext()){
-                                    System.out.println("************** " + aux + "ª PASSAGEM AEREA **************");
-                                    iterator = usuario.getPassagens().getLast().getTrechos().iterator();
-                                    System.out.println("");
-                                    System.out.println("Nome: " + usuario.getNome());
-                                    aux++;
-                                    while(iterator.hasNext()){
-                                        Trecho trecho = (Trecho) iterator.next();
-                                        System.out.println("TRECHO: " + trecho.getLocalPartida() + " --> " + trecho.getLocalChegada());
-                                    } System.out.println(""); System.out.println("");
+                                    Passagem passagem = (Passagem)iteratorP.next();
+                                    if(passagem.isStatusCompra()){
+                                        System.out.println("************** " + aux + "ª PASSAGEM AEREA **************");
+                                        iterator = usuario.getPassagens().getLast().getTrechos().iterator();
+                                        System.out.println("");
+                                        System.out.println("Nome: " + usuario.getNome());
+                                        aux++;
+                                        while(iterator.hasNext()){
+                                            Trecho trecho = (Trecho) iterator.next();
+                                            System.out.println("TRECHO: " + trecho.getLocalPartida() + " --> " + trecho.getLocalChegada());
+                                        } System.out.println(""); System.out.println("");
+                                    }
+                                    
                                 }
                             }
                             break;
-                        case 4:
+                        case 5:
                             finalizarPrograma();
                             break;
                        
                     }
-                    do{
+                    if(opcoesUsuario == 1 || opcoesUsuario == 2 || opcoesUsuario == 3){
+                        do{
                             System.out.println("Digite a opção que desejar: ");
                             System.out.println("[01] - Ver trechos.");
                             //System.out.println("[02] - Voltar ao menu.");
@@ -234,12 +241,13 @@ public class ClienteInterface {
                                 controllerUsuario = (ControllerUsuario)obj[0];
                                 controllerTrechos = (ControllerTrechos)obj[1];
                             } else{
+                                usuario.getPassagens().getLast().setStatusCompra(true);
                                 System.out.println("Sua compra foi finalizada com sucesso!");
                                 opcoesUsuario = 2;
                             }
                             System.out.println("PAROU AQUI");
                         }while(opcoesUsuario==01); //DO WHILE que retorna para a opção de trechos ou menu.
-                    
+                    } opcoesUsuario = 2;
                     System.out.println("PAROU AQUI 2");
                 }while(opcoesUsuario == 2); //DO WHILE que retorna o usuário ao menu.
             //}while(opcoesUsuario == 4);
