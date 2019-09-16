@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
  */
 package view;
 
@@ -15,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -56,10 +53,10 @@ public class Servidor implements Serializable {
             ControllerTrechos cTrecho = (ControllerTrechos)cTrechos;
             ArquivoEscritaLeitura2 arquivo = new ArquivoEscritaLeitura2(C_CU);
             arquivo.recuperar();
+            System.setProperty("java.rmi.server.hostname", "localhost");
             Registry registry = LocateRegistry.createRegistry(porta);
             registry.bind("CompanhiaAerea", CU);
-            //Registry registryTrecho = registry;
-            registry.bind("CompanhiaAereaA", cTrechos);
+            registry.bind("CompanhiaAereaTrecho", cTrechos);
             System.out.println("Servidor Iniciado");
             if (porta == 1888) {
                 companhia = "A";

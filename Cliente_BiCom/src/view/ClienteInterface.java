@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * 
  */
 package view;
 
@@ -13,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -89,28 +88,36 @@ public class ClienteInterface {
     }
     
     /**
-     * Faz a troca de servidor ou não dependendo dos trechos comprados pelo usuário.
+     * Retorna uma porta dependendo dos trechos comprados pelo usuário.
      * 
      * @param companhia
-     * @return Registry[]
+     * @return
      * @throws RemoteException 
      */
-    public static Registry[] trocarServidor(String companhia) throws RemoteException {
+    public static int trocarServidor(String companhia) throws RemoteException {
         if (companhia.equalsIgnoreCase("CompanhiaA")) {
-            System.out.println("CompanhiaA");
-            return conectarServidores(1888);
+            return 1888;
         } else if (companhia.equalsIgnoreCase("CompanhiaB")) {
-            System.out.println("CompanhiaB");
-            return conectarServidores(1889);
+            return 1889;
         } else {
-            System.out.println("CompanhiaC");
-            return conectarServidores(1890);
+            return 1890;
         }
     }
-
-    public static Object[] iniciarController(Registry registry, Registry registryTrecho) throws RemoteException, IOException, NotBoundException, FileNotFoundException, ClassNotFoundException {
-        C_Usuario interfaceUsuario = (C_Usuario) registry.lookup("CompanhiaAerea");
-        C_Trechos interfaceTrechos = (C_Trechos) registryTrecho.lookup("CompanhiaAereaA");
+    
+    /**
+     * Inicia conexão com o servidor e retorna ControllerUsuario e ControllerTrechos.
+     * 
+     * @param porta
+     * @return Object[]
+     * @throws RemoteException
+     * @throws IOException
+     * @throws NotBoundException
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException 
+     */
+    public static Object[] iniciarController(int porta) throws RemoteException, IOException, NotBoundException, FileNotFoundException, ClassNotFoundException {
+        C_Usuario interfaceUsuario = (C_Usuario) Naming.lookup("rmi://localhost:" + porta + "/CompanhiaAerea");
+        C_Trechos interfaceTrechos = (C_Trechos) Naming.lookup("rmi://localhost:" + porta + "/CompanhiaAereaTrecho");
         ControllerUsuario controllerUsuario = new ControllerUsuario(interfaceUsuario);
         ControllerTrechos controllerTrechos = new ControllerTrechos(interfaceTrechos);
 
@@ -131,22 +138,23 @@ public class ClienteInterface {
      * @throws FileNotFoundException
      * @throws ClassNotFoundException 
      */
-    public static ArrayList<Trecho> finalizarCompra(Usuario usuario, ControllerTrechos c) throws RemoteException, IOException, FileNotFoundException, ClassNotFoundException {
+    public static synchronized ArrayList<Trecho> finalizarCompra(Usuario usuario, ControllerTrechos c) throws RemoteException, IOException, FileNotFoundException, ClassNotFoundException {
         if (!usuario.getPassagens().isEmpty()) {
             Passagem passagem = usuario.getPassagens().getLast();
             if (!passagem.isStatusCompra()) {
                 Iterator iterator = passagem.getTrechos().iterator();
                 ArrayList<Trecho> auxTrechos = new ArrayList();
-
+                 boolean auxB;
                 while (iterator.hasNext()) {
                     Trecho trecho = (Trecho) iterator.next();
-                    boolean auxB = false;
+                    auxB = true;
                     try {
                         auxB = comunicarServidor(trecho, c);
                     } catch (NotBoundException ex) {
                         Logger.getLogger(ControllerTrechos.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    if (!auxB) {
+                    if (auxB == false) {
+                        System.out.println("oi");
                         auxTrechos.add(trecho);
                     }
                 }
@@ -166,7 +174,7 @@ public class ClienteInterface {
      * 
      * @param trecho
      * @param c
-     * @return
+     * @return boolean
      * @throws RemoteException
      * @throws NotBoundException
      * @throws IOException
@@ -176,21 +184,19 @@ public class ClienteInterface {
     private static boolean comunicarServidor(Trecho trecho, ControllerTrechos c) throws RemoteException, NotBoundException, IOException, FileNotFoundException, ClassNotFoundException {
         Registry registry = null;
         Registry registryTrecho = null;
+        int porta;
         if ("CompanhiaB".equals(trecho.getID())) {
             return c.comprarTrechos(trecho);
         } else {
             if ("CompanhiaA".equals(trecho.getID())) {
-                registry = LocateRegistry.getRegistry(1888);
-                registryTrecho = LocateRegistry.getRegistry(1888);
+                porta = 1888;
             } else if ("CompanhiaB".equals(trecho.getID())) {
-                registry = LocateRegistry.getRegistry(1889);
-                registryTrecho = LocateRegistry.getRegistry(1889);
+                porta = 1889;
             } else {
-                registry = LocateRegistry.getRegistry(1890);
-                registryTrecho = LocateRegistry.getRegistry(1890);
+                porta = 1890;
             }
-            C_Usuario interfaceUsuario = (C_Usuario) registry.lookup("CompanhiaAerea");
-            C_Trechos interfaceTrechos = (C_Trechos) registryTrecho.lookup("CompanhiaAereaA");
+            C_Usuario interfaceUsuario = (C_Usuario) Naming.lookup("rmi://localhost:" + porta + "/CompanhiaAerea");
+            C_Trechos interfaceTrechos = (C_Trechos) Naming.lookup("rmi://localhost:" + porta + "/CompanhiaAereaTrecho");
             ControllerUsuario controllerUsuario = new ControllerUsuario(interfaceUsuario);
             ControllerTrechos controllerTrechos = new ControllerTrechos(interfaceTrechos);
             return controllerTrechos.comprarTrechos(trecho);
@@ -224,13 +230,9 @@ public class ClienteInterface {
             dados = bufferedReader.readLine();
             porta = Integer.parseInt(dados);
         } while (porta != 1888 && porta != 1889 && porta != 1890);
-
-        rAux = conectarServidores(porta);
-        registry = rAux[0];
-        registryTrecho = rAux[1];
-
+        
         try {
-            obj = iniciarController(registry, registryTrecho);
+            obj = iniciarController(porta);
             controllerUsuario = (ControllerUsuario) obj[0];
             controllerTrechos = (ControllerTrechos) obj[1];
 
@@ -359,12 +361,7 @@ public class ClienteInterface {
                             Trecho t = arrayT.get(porta);
                             usuario.setPassagens(controllerTrechos.addTrecho(usuario, t).getPassagens());
 
-                            // método é chamado para fazer a troca (ou não) do servidor dependendo do trecho escolhido
-                            rAux = trocarServidor(t.getIDCOMPRA());
-                            registry = rAux[0];
-                            registryTrecho = rAux[1];
-
-                            obj = iniciarController(registry, registryTrecho);
+                            obj = iniciarController(trocarServidor(t.getIDCOMPRA()));
                             controllerUsuario = (ControllerUsuario) obj[0];
                             controllerTrechos = (ControllerTrechos) obj[1];
                         } else {
@@ -392,9 +389,16 @@ public class ClienteInterface {
                                 for (int i = 0; i < auxTrechos.size(); i++) {
                                     usuario.getPassagens().getLast().getTrechos().remove(auxTrechos.get(i));
                                 }
-                                usuario.getPassagens().getLast().setStatusCompra(true);
-                                controllerTrechos.confirmarCompra(usuario);
-                                System.out.println("Sua compra foi finalizada com sucesso!");
+                                
+                                if(usuario.getPassagens().getLast().getTrechos().isEmpty()){
+                                    System.out.println("Não sobrou bilhete para completar a compra!");
+                                } else{
+                                    usuario.getPassagens().getLast().setStatusCompra(true);
+                                    controllerTrechos.confirmarCompra(usuario);
+                                    System.out.println("Sua compra foi finalizada com sucesso!");
+                                }
+                                
+                                
                             }
                         }
                     } while (opcoesUsuario == 01); //DO WHILE que retorna para a opção de trechos ou menu.

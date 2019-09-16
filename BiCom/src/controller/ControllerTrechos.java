@@ -5,23 +5,14 @@
 package controller;
 
 import Interface.C_Trechos;
-import Interface.C_Usuario;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Passagem;
 import model.Trecho;
 import model.Usuario;
 import util.TrechosProntos;
-import view.Servidor;
-
 /**
  *
  * @author Adlla Katarine
@@ -97,18 +88,19 @@ public class ControllerTrechos extends UnicastRemoteObject implements C_Trechos 
      */
     @Override
     public boolean comprarTrechos(Trecho trecho) {
-        Iterator iterator = this.trechos.iterator();
+        synchronized (this) {
+            Iterator iterator = this.trechos.iterator();
 
-        while (iterator.hasNext()) {
-            Trecho trechinho = (Trecho) iterator.next();
-            if (trecho.getLocalPartida().equals(trechinho.getLocalPartida()) && trecho.getLocalChegada().equals(trechinho.getLocalChegada())) {
-                if (trechinho.getQuantAssentos() > 0) {
-                    trechinho.setQuantAssentos();
-                    return true;
+            while (iterator.hasNext()) {
+                Trecho trechinho = (Trecho) iterator.next();
+                if (trecho.getLocalPartida().equals(trechinho.getLocalPartida()) && trecho.getLocalChegada().equals(trechinho.getLocalChegada())) {
+                    if (trechinho.getQuantAssentos() > 0) {
+                        trechinho.setQuantAssentos();
+                        return true;
+                    }
                 }
             }
-        }
-        return false;
+        } return false;
     }
 
     /**
@@ -120,10 +112,5 @@ public class ControllerTrechos extends UnicastRemoteObject implements C_Trechos 
         if (!usuario.getPassagens().getLast().isStatusCompra()) {
             usuario.getPassagens().getLast().setStatusCompra(true);
         }
-    }
-
-    @Override
-    public ArrayList<Trecho> finalizarCompra(Usuario usuario) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
