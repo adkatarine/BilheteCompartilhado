@@ -76,11 +76,11 @@ public class Servidor implements Serializable {
             }
             System.out.println("Você é a Companhia Aerea " + companhia);
             System.out.println("\n");
-            
+            arquivo.gravar();
         } catch (RemoteException e) {
             e.printStackTrace();
         } finally {
-            arquivo.gravar();
+            
         }
     }
 }
