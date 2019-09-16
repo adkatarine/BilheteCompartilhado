@@ -1,5 +1,5 @@
 /*
- * 
+ * Classe responsável por guardar todas as informações de cada trecho vendido/comprado.
  */
 package model;
 
@@ -51,6 +51,7 @@ public class Trecho implements Serializable{
         return quantAssentos;
     }
 
+    // decrementa a quantidade de assentos toda vez que seu trecho é comprado
     public void setQuantAssentos() {
         if(this.quantAssentos >= 1){
             this.quantAssentos = this.quantAssentos - 1;

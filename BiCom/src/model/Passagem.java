@@ -1,5 +1,5 @@
 /*
- * 
+ * Classe responsável pelos trechos comprados pelo usuário, formando uma passagem.
  */
 package model;
 

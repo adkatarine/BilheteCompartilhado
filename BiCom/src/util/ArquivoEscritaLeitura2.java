@@ -29,11 +29,11 @@ public class ArquivoEscritaLeitura2 implements Serializable {
      * @throws java.io.FileNotFoundException
      */
     public void gravar() throws FileNotFoundException, IOException {
-        //Arquivo que guarda os dados dos ADM's
-        FileOutputStream fileoutput_ADM = new FileOutputStream("IDB_ADM");
-        ObjectOutputStream objectoutput_ADM = new ObjectOutputStream(fileoutput_ADM);
-        objectoutput_ADM.writeObject(usuario.getUsuarios());
-        objectoutput_ADM.close();
+        //Arquivo que guarda os dados dos usuários
+        FileOutputStream fileoutput_BiCom = new FileOutputStream("BiCom");
+        try (ObjectOutputStream objectoutput_BiCom = new ObjectOutputStream(fileoutput_BiCom)) {
+            objectoutput_BiCom.writeObject(usuario.getUsuarios());
+        }
     }
 
     /**
@@ -43,11 +43,11 @@ public class ArquivoEscritaLeitura2 implements Serializable {
      * @throws java.lang.ClassNotFoundException
      */
     public void recuperar() throws FileNotFoundException, IOException, ClassNotFoundException {
-        //Arquivo que guarda os dados dos ADM's
-        FileInputStream fileinput_ADM = new FileInputStream("IDB_ADM");
-        ObjectInputStream objectinput_ADM = new ObjectInputStream(fileinput_ADM);
-        usuario.setUsuarios((LinkedList<Usuario>) objectinput_ADM.readObject());
-        objectinput_ADM.close();
+        //Arquivo que guarda os dados dos usuários
+        FileInputStream fileinput_BiCom = new FileInputStream("BiCom");
+        try (ObjectInputStream objectinput_BiCom = new ObjectInputStream(fileinput_BiCom)) {
+            usuario.setUsuarios((LinkedList<Usuario>) objectinput_BiCom.readObject());
+        }
 
     }
 

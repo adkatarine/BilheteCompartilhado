@@ -1,13 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Classe com todos os trechos "disponíveis" para serem criados assim que cada servidor for iniciado.
  */
 package util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import model.Trecho;
 
 /**
@@ -15,16 +12,20 @@ import model.Trecho;
  * @author Adlla Katarine
  */
 public class TrechosProntos implements Serializable{
-    private ArrayList<Trecho> trechos;
-    private Trecho trecho;
+    private ArrayList<Trecho> trechos; // array que guarda todos os objetos de trechos criados
+    private Trecho trecho; // atributo para instancia de cada trecho
     private static final long serialVersionUID = 6L;
     
     public TrechosProntos(){
         this.trechos = new ArrayList();
     }
     
-    //Trecho(String localPartida, String localChegada, int quantAssentos, String ID, float valorTrecho)
-    
+    /**
+     * Recebe o valor da porta do servidor e instacia os trechos referentes a ela.
+     * 
+     * @param porta
+     * @return ArrayList<Trecho>
+     */
     public ArrayList<Trecho> add(int porta){
         
         switch (porta) {
@@ -225,8 +226,6 @@ public class TrechosProntos implements Serializable{
                 
                 System.out.println("CompanhiaC");
                 break;
-        }
-        
-        return trechos;
+        } return trechos;
     }
 }

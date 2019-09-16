@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Controller responsável pelo cadastro e login do usuário.
  */
 package controller;
 
@@ -10,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import model.Usuario;
 
@@ -20,23 +17,22 @@ import model.Usuario;
  */
 public class ControllerUsuario extends UnicastRemoteObject implements C_Usuario{
     
-    private Registry registry = null;
-    C_Usuario CU;
+    C_Usuario controller_U;
     private static final long serialVersionUID = 5L;
     
     
-  public ControllerUsuario(C_Usuario a) throws RemoteException, NotBoundException, IOException, FileNotFoundException, ClassNotFoundException{
-        this.CU = a;
+  public ControllerUsuario(C_Usuario controllerUsuario) throws RemoteException, NotBoundException, IOException, FileNotFoundException, ClassNotFoundException{
+        this.controller_U = controllerUsuario;
     }
     
     @Override
     public Usuario cadastrarUsuario(String nome, String CPF, String email, String login, String senha) throws RemoteException {
-        Usuario u = CU.cadastrarUsuario(nome, CPF, email, login, senha);
+        Usuario u = controller_U.cadastrarUsuario(nome, CPF, email, login, senha);
        return u;
     }
 
     @Override
     public Usuario loginUsuario(String CPF, String senha) throws RemoteException {
-        return CU.loginUsuario(CPF, senha);
+        return controller_U.loginUsuario(CPF, senha);
     }
 }

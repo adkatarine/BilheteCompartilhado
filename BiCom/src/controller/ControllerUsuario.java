@@ -5,14 +5,11 @@
 package controller;
 
 import Interface.C_Usuario;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import model.Usuario;
-import util.ArquivoEscritaLeitura2;
 
 /**
  *

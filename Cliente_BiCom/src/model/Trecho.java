@@ -1,5 +1,5 @@
 /*
- * 
+ * Classe responsável por guardar todas as informações de cada trecho vendido/comprado.
  */
 package model;
 

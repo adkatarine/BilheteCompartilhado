@@ -32,9 +32,9 @@ public class Servidor implements Serializable {
      */
     public static void main(String[] args) throws IOException, FileNotFoundException, ClassNotFoundException, AlreadyBoundException {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-            int porta;
-            String companhia;
-            String dados;
+            int porta; //variável para guardar valor da porta escolhida
+            String companhia; // variável para guardar a companhia escolhida dependendo do valor da porta
+            String dados; // variável auxiliar para leitura do teclado
             
         try {
             System.out.println("Digite sua porta de Companhia Aerea:");
@@ -42,6 +42,7 @@ public class Servidor implements Serializable {
             System.out.println("[Porta 1889] Companhia Aerea B - Regiões Contro-Oeste.");
             System.out.println("[Porta 1890] Companhia Aerea C - Regiões Sudeste e Sul.");
 
+            //usuário escolhe o servidor que deseja iniciar
             do {
                 dados = bufferedReader.readLine();
                 porta = Integer.parseInt(dados);
@@ -62,13 +63,10 @@ public class Servidor implements Serializable {
             System.out.println("Servidor Iniciado");
             if (porta == 1888) {
                 companhia = "A";
-                cTrecho.setServidor("CompanhiaA");
             } else if (porta == 1889) {
                 companhia = "B";
-                 cTrecho.setServidor("CompanhiaB");
             } else {
                 companhia = "C";
-                 cTrecho.setServidor("CompanhiaC");
             }
             System.out.println("Você é a Companhia Aerea " + companhia);
             System.out.println("\n");

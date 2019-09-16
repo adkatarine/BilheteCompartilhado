@@ -1,5 +1,5 @@
 /**
- * 
+ * Classe responsável por guardar todas as informações pessoas do usuário, assim como todas as suas passagens adquiridas.
  */
 package model;
 

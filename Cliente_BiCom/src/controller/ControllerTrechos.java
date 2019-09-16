@@ -1,20 +1,15 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Controller responsável pela venda de trechos disponíveis aos usuários.
  */
 package controller;
 
 import Interface.C_Trechos;
-import Interface.C_Usuario;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Iterator;
 import model.Trecho;
 import model.Usuario;
 
@@ -25,7 +20,6 @@ import model.Usuario;
 public class ControllerTrechos extends UnicastRemoteObject implements C_Trechos{
 
     private static final long serialVersionUID = 4L;
-    private Registry registry = null;
     private C_Trechos cTrechos;
     
     public ControllerTrechos(C_Trechos trecho) throws RemoteException, NotBoundException, IOException, FileNotFoundException, ClassNotFoundException{
