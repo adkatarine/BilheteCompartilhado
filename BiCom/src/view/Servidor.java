@@ -16,6 +16,8 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Iterator;
+import model.Usuario;
 import util.*;
 
 /**
@@ -32,7 +34,8 @@ public class Servidor implements Serializable {
             int porta; //variável para guardar valor da porta escolhida
             String companhia; // variável para guardar a companhia escolhida dependendo do valor da porta
             String dados; // variável auxiliar para leitura do teclado
-            
+            ArquivoEscritaLeitura2 arquivo = null;
+            String IP = "localhost";
         try {
             System.out.println("Digite sua porta de Companhia Aerea:");
             System.out.println("[Porta 1888] Companhia Aerea A - Regiões Norte e Nordeste.");
@@ -51,9 +54,15 @@ public class Servidor implements Serializable {
             
             C_Trechos cTrechos = new ControllerTrechos(porta);
             ControllerTrechos cTrecho = (ControllerTrechos)cTrechos;
-            ArquivoEscritaLeitura2 arquivo = new ArquivoEscritaLeitura2(C_CU);
+            arquivo = new ArquivoEscritaLeitura2(C_CU);
             arquivo.recuperar();
-            System.setProperty("java.rmi.server.hostname", "localhost");
+            
+            Iterator iterator = C_CU.getUsuarios().iterator();
+            while(iterator.hasNext()){
+                Usuario u = (Usuario) iterator.next();
+                System.out.println(u.getNome());
+            }
+            System.setProperty("java.rmi.server.hostname", IP);
             Registry registry = LocateRegistry.createRegistry(porta);
             registry.bind("CompanhiaAerea", CU);
             registry.bind("CompanhiaAereaTrecho", cTrechos);
@@ -67,11 +76,11 @@ public class Servidor implements Serializable {
             }
             System.out.println("Você é a Companhia Aerea " + companhia);
             System.out.println("\n");
-
+            
         } catch (RemoteException e) {
             e.printStackTrace();
         } finally {
+            arquivo.gravar();
         }
     }
-
 }

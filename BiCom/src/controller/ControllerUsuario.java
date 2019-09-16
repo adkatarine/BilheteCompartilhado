@@ -42,7 +42,7 @@ public class ControllerUsuario extends UnicastRemoteObject implements C_Usuario 
     public Usuario cadastrarUsuario(String nome, String CPF, String email, String login, String senha){
         if(this.verificarCadastroUsuario(CPF, senha) == null){
             Usuario usuarioCadastro = new Usuario(nome, CPF, email, login, senha);
-        
+            System.out.println("USUÁRIO CADASTRADO");
             this.usuarios.add(usuarioCadastro);
             return usuarioCadastro;
         } return null;
@@ -59,7 +59,7 @@ public class ControllerUsuario extends UnicastRemoteObject implements C_Usuario 
             
             while(iterator.hasNext()){
                 Usuario pessoaCadastrada = (Usuario)iterator.next();
-                
+                System.out.println("USUÁRIO VERIFICADO");
                 if(pessoaCadastrada.getCPF().equals(CPF) && pessoaCadastrada.getSenha().equals(senha)){
                     return pessoaCadastrada;
                 }
@@ -78,6 +78,8 @@ public class ControllerUsuario extends UnicastRemoteObject implements C_Usuario 
         Usuario usuarioLogin;
         
         if((usuarioLogin = this.verificarCadastroUsuario(CPF, senha)) != null){
+            System.out.println(usuarioLogin.getNome());
+            System.out.println("USUÁRIO LOGADO");
             return usuarioLogin;
         } return null;
     }

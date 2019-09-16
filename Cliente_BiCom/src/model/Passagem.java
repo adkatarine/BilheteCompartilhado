@@ -20,7 +20,8 @@ public class Passagem implements Serializable{
      * 
      * Contrutor. Nele, a lista de trechos é instanciada e outros atributos são iniciados automaticamente.
      */
-    Passagem(){
+    
+    public Passagem(){
         this.trechos = new LinkedList();
         this.statusCompra = false;
         this.valorTotalPassagem = 0;
@@ -51,5 +52,7 @@ public class Passagem implements Serializable{
         this.valorTotalPassagem = this.valorTotalPassagem + valorTotalPassagem;
     }
     
-    
+    public void addTrecho(Trecho trecho){
+        this.trechos.add(trecho);
+    }
 }

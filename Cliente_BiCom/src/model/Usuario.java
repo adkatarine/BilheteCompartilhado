@@ -80,6 +80,10 @@ public class Usuario implements Serializable{
         this.passagens = passagens;
     }
 
+    public void addPassagem(Passagem passagem){
+        this.passagens.add(passagem);
+    }
+    
     @Override
     public String toString() {
         return "Usuario{" + "nome=" + nome + ", CPF=" + CPF + ", email=" + email + ", login=" + login + ", senha=" + senha + ", passagens=" + passagens + '}';

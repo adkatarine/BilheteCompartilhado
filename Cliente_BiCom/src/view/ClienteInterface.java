@@ -32,7 +32,7 @@ public class ClienteInterface {
 
     /**
      * Separa strings em um vetor de strings.
-     * 
+     *
      * @param info
      * @return String[]
      */
@@ -42,7 +42,7 @@ public class ClienteInterface {
 
     /**
      * Finaliza a execução do programa.
-     * 
+     *
      */
     public static void finalizarPrograma() {
         System.out.println("O PROGRAMA SERÁ FINALIZADO.");
@@ -50,11 +50,12 @@ public class ClienteInterface {
     }
 
     /**
-     * Conecta o usuário ao servidor escolhido por ele através do número da porta.
-     * 
+     * Conecta o usuário ao servidor escolhido por ele através do número da
+     * porta.
+     *
      * @param porta
      * @return Registry[]
-     * @throws RemoteException 
+     * @throws RemoteException
      */
     public static Registry[] conectarServidores(int porta) throws RemoteException {
         Registry registry = null;
@@ -86,13 +87,13 @@ public class ClienteInterface {
         r[1] = registryTrecho;
         return r;
     }
-    
+
     /**
      * Retorna uma porta dependendo dos trechos comprados pelo usuário.
-     * 
+     *
      * @param companhia
      * @return
-     * @throws RemoteException 
+     * @throws RemoteException
      */
     public static int trocarServidor(String companhia) throws RemoteException {
         if (companhia.equalsIgnoreCase("CompanhiaA")) {
@@ -103,21 +104,37 @@ public class ClienteInterface {
             return 1890;
         }
     }
-    
+
     /**
-     * Inicia conexão com o servidor e retorna ControllerUsuario e ControllerTrechos.
-     * 
+     * Inicia conexão com o servidor e retorna ControllerUsuario e
+     * ControllerTrechos.
+     *
      * @param porta
      * @return Object[]
      * @throws RemoteException
      * @throws IOException
      * @throws NotBoundException
      * @throws FileNotFoundException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
     public static Object[] iniciarController(int porta) throws RemoteException, IOException, NotBoundException, FileNotFoundException, ClassNotFoundException {
-        C_Usuario interfaceUsuario = (C_Usuario) Naming.lookup("rmi://localhost:" + porta + "/CompanhiaAerea");
-        C_Trechos interfaceTrechos = (C_Trechos) Naming.lookup("rmi://localhost:" + porta + "/CompanhiaAereaTrecho");
+        String IP;
+        switch (porta) {
+            case 1888:
+                System.out.println("print 1888");
+                IP = "localhost";
+                break;
+            case 1889:
+                System.out.println("print 1889");
+                IP = "localhost";
+                break;
+            default:
+                System.out.println("print 1890");
+                IP = "localhost";
+                break;
+        }
+        C_Usuario interfaceUsuario = (C_Usuario) Naming.lookup("rmi://" + IP + ":" + porta + "/CompanhiaAerea");
+        C_Trechos interfaceTrechos = (C_Trechos) Naming.lookup("rmi://" + IP + ":" + porta + "/CompanhiaAereaTrecho");
         ControllerUsuario controllerUsuario = new ControllerUsuario(interfaceUsuario);
         ControllerTrechos controllerTrechos = new ControllerTrechos(interfaceTrechos);
 
@@ -128,15 +145,16 @@ public class ClienteInterface {
     }
 
     /**
-     * Responsável por verificar se existe passagem a ser comprada, chama o método comunicarServidor, verificando e tratando o seu return.
-     * 
+     * Responsável por verificar se existe passagem a ser comprada, chama o
+     * método comunicarServidor, verificando e tratando o seu return.
+     *
      * @param usuario
      * @param c
      * @return ArrayList<Trecho>
      * @throws RemoteException
      * @throws IOException
      * @throws FileNotFoundException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
     public static synchronized ArrayList<Trecho> finalizarCompra(Usuario usuario, ControllerTrechos c) throws RemoteException, IOException, FileNotFoundException, ClassNotFoundException {
         if (!usuario.getPassagens().isEmpty()) {
@@ -144,7 +162,7 @@ public class ClienteInterface {
             if (!passagem.isStatusCompra()) {
                 Iterator iterator = passagem.getTrechos().iterator();
                 ArrayList<Trecho> auxTrechos = new ArrayList();
-                 boolean auxB;
+                boolean auxB;
                 while (iterator.hasNext()) {
                     Trecho trecho = (Trecho) iterator.next();
                     auxB = true;
@@ -170,8 +188,9 @@ public class ClienteInterface {
     }
 
     /**
-     * Verifica em qual companhia o trecho foi comprado, conecta-se a ele e chama o método para comprar os trechos.
-     * 
+     * Verifica em qual companhia o trecho foi comprado, conecta-se a ele e
+     * chama o método para comprar os trechos.
+     *
      * @param trecho
      * @param c
      * @return boolean
@@ -179,30 +198,66 @@ public class ClienteInterface {
      * @throws NotBoundException
      * @throws IOException
      * @throws FileNotFoundException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
     private static boolean comunicarServidor(Trecho trecho, ControllerTrechos c) throws RemoteException, NotBoundException, IOException, FileNotFoundException, ClassNotFoundException {
-        Registry registry = null;
-        Registry registryTrecho = null;
         int porta;
+        String IP;
         if ("CompanhiaB".equals(trecho.getID())) {
             return c.comprarTrechos(trecho);
         } else {
             if ("CompanhiaA".equals(trecho.getID())) {
                 porta = 1888;
+                IP = "localhost";
             } else if ("CompanhiaB".equals(trecho.getID())) {
                 porta = 1889;
+                IP = "localhost";
+
             } else {
                 porta = 1890;
+                IP = "localhost";
             }
-            C_Usuario interfaceUsuario = (C_Usuario) Naming.lookup("rmi://localhost:" + porta + "/CompanhiaAerea");
-            C_Trechos interfaceTrechos = (C_Trechos) Naming.lookup("rmi://localhost:" + porta + "/CompanhiaAereaTrecho");
+            C_Usuario interfaceUsuario = (C_Usuario) Naming.lookup("rmi://" + IP + ":" + porta + "/CompanhiaAerea");
+            C_Trechos interfaceTrechos = (C_Trechos) Naming.lookup("rmi://" + IP + ":" + porta + "/CompanhiaAereaTrecho");
             ControllerUsuario controllerUsuario = new ControllerUsuario(interfaceUsuario);
             ControllerTrechos controllerTrechos = new ControllerTrechos(interfaceTrechos);
             return controllerTrechos.comprarTrechos(trecho);
         }
     }
+    
+    /**
+     * Verifica se há passagens compradas ou se a última ainda não teve sua compra finalizada. Chama o método addTrechoAux() para
+     * add o trecho.
+     * 
+     * @param usuario
+     * @param trecho
+     * @return Usuario
+     */
+    public static Usuario addTrecho(Usuario usuario, Trecho trecho) {
+        if (usuario.getPassagens().size() > 0) {
+            Passagem passagem = usuario.getPassagens().getLast();
+            if (!passagem.isStatusCompra()) {
+                passagem.addTrecho(trecho);
+            } else {
+                addTrechoAux(usuario, trecho);
+            }
+        } else {
+            addTrechoAux(usuario, trecho);
+        }
+        return usuario;
+    }
 
+    /**
+     * Adiciona trecho escolhido pelo usuário em sua passagem.
+     * 
+     * @param usuario
+     * @param trecho 
+     */
+    public static void addTrechoAux(Usuario usuario, Trecho trecho) {
+        Passagem passagemAux = new Passagem();
+        passagemAux.addTrecho(trecho);
+        usuario.addPassagem(passagemAux);
+    }
     /**
      * @param args the command line arguments
      */
@@ -230,7 +285,7 @@ public class ClienteInterface {
             dados = bufferedReader.readLine();
             porta = Integer.parseInt(dados);
         } while (porta != 1888 && porta != 1889 && porta != 1890);
-        
+
         try {
             obj = iniciarController(porta);
             controllerUsuario = (ControllerUsuario) obj[0];
@@ -258,7 +313,12 @@ public class ClienteInterface {
                         System.out.println("Digite seu user, senha e CPF nessa ordem e com um espaço entre cada informação.");
                         mensagem = separarString(bufferedReader.readLine());
                         usuario = controllerUsuario.loginUsuario(mensagem[2], mensagem[1]);
-                        opcoesUsuario = 1;
+                        if (usuario == null) {
+                            opcoesUsuario = 6;
+                            System.out.println("Você não está cadastrado ou inseriu seus dados errados.");
+                        } else {
+                            opcoesUsuario = 1;
+                        }
                         break;
                     case 4: // ver passagens compradas
                         System.out.println("Digite a opção que desejar:");
@@ -286,7 +346,8 @@ public class ClienteInterface {
                                 Passagem passagem = (Passagem) iteratorP.next();
                                 if (passagem.isStatusCompra()) {
                                     System.out.println("************** " + aux + "ª PASSAGEM AEREA **************");
-                                    iterator = usuario.getPassagens().getLast().getTrechos().iterator();
+                                    //iterator = usuario.getPassagens().getLast().getTrechos().iterator(); 
+                                    iterator = passagem.getTrechos().iterator();
                                     System.out.println("");
                                     System.out.println("Nome: " + usuario.getNome());
                                     aux++;
@@ -306,7 +367,7 @@ public class ClienteInterface {
                         break;
 
                 }
-                
+
                 // logo após finalização do cadastro ou login e da escolha da opção 3 do menu, o usuário é direcionado para este if.
                 if (opcoesUsuario == 1 || opcoesUsuario == 2 || opcoesUsuario == 3) {
                     do {
@@ -353,14 +414,15 @@ public class ClienteInterface {
                                 dados = bufferedReader.readLine();
                                 porta = Integer.parseInt(dados);
 
-                                if (porta < 0 && porta > arrayT.size() + 1) {
+                                if (porta < 0 && porta > arrayT.size()) {
                                     System.out.println("");
                                     System.out.println("Opção incorreta. Digite novamente, por favor.");
                                 }
-                            } while (porta < 0 && porta > arrayT.size() + 1);
+                            } while (porta < 0 && porta > arrayT.size());
                             Trecho t = arrayT.get(porta);
-                            usuario.setPassagens(controllerTrechos.addTrecho(usuario, t).getPassagens());
-
+                            usuario = controllerTrechos.addTrecho(usuario, t);
+                            //usuario.setPassagens(controllerTrechos.addTrecho(usuario, t).getPassagens());
+                            //addTrecho(controllerTrechos.addTrecho(usuario, t), t);
                             obj = iniciarController(trocarServidor(t.getIDCOMPRA()));
                             controllerUsuario = (ControllerUsuario) obj[0];
                             controllerTrechos = (ControllerTrechos) obj[1];
@@ -389,20 +451,20 @@ public class ClienteInterface {
                                 for (int i = 0; i < auxTrechos.size(); i++) {
                                     usuario.getPassagens().getLast().getTrechos().remove(auxTrechos.get(i));
                                 }
-                                
-                                if(usuario.getPassagens().getLast().getTrechos().isEmpty()){
+
+                                if (usuario.getPassagens().getLast().getTrechos().isEmpty()) {
                                     System.out.println("Não sobrou bilhete para completar a compra!");
-                                } else{
+                                } else {
                                     usuario.getPassagens().getLast().setStatusCompra(true);
                                     controllerTrechos.confirmarCompra(usuario);
                                     System.out.println("Sua compra foi finalizada com sucesso!");
                                 }
-                                
-                                
+
                             }
                         }
                     } while (opcoesUsuario == 01); //DO WHILE que retorna para a opção de trechos ou menu.
-                }opcoesUsuario = 2;
+                }
+                opcoesUsuario = 2;
             } while (opcoesUsuario == 2); //DO WHILE que retorna o usuário ao menu.
         } catch (RemoteException e) {
             e.printStackTrace();

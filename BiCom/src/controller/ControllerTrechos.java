@@ -58,13 +58,17 @@ public class ControllerTrechos extends UnicastRemoteObject implements C_Trechos 
     public Usuario addTrecho(Usuario usuario, Trecho trecho) {
         if (usuario.getPassagens().size() > 0) {
             Passagem passagem = usuario.getPassagens().getLast();
+            System.out.println("primeiro if");
             if (!passagem.isStatusCompra()) {
                 passagem.addTrecho(trecho);
+                System.out.println("segundo if" + trecho.getLocalPartida() + " - "+ trecho.getLocalChegada());
             } else {
                 addTrechoAux(usuario, trecho);
+                System.out.println("primeiro else" + trecho.getLocalPartida() + " - "+ trecho.getLocalChegada());
             }
         } else {
             addTrechoAux(usuario, trecho);
+            System.out.println("segundo else" + trecho.getLocalPartida() + " - "+ trecho.getLocalChegada());
         }
         return usuario;
     }
