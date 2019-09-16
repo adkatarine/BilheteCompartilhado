@@ -31,7 +31,6 @@ public class ControllerUsuario extends UnicastRemoteObject implements C_Usuario{
     
     @Override
     public Usuario cadastrarUsuario(String nome, String CPF, String email, String login, String senha) throws RemoteException {
-        System.out.println("a");
         Usuario u = CU.cadastrarUsuario(nome, CPF, email, login, senha);
        return u;
     }

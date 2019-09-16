@@ -47,7 +47,6 @@ public class ControllerUsuario extends UnicastRemoteObject implements C_Usuario 
             Usuario usuarioCadastro = new Usuario(nome, CPF, email, login, senha);
         
             this.usuarios.add(usuarioCadastro);
-            System.out.println("Usuario cadastrado");
             return usuarioCadastro;
         } return null;
     }

@@ -26,16 +26,6 @@ import util.*;
  * @author Adlla Katarine
  */
 public class Servidor implements Serializable {
-
-    /*public static void conectarServidor(int porta) throws RemoteException, NotBoundException{
-        Registry registry = LocateRegistry.getRegistry(porta);
-        Registry registryTrecho = LocateRegistry.getRegistry(porta);
-        
-        C_Usuario interfaceUsuario = (C_Usuario) registry.lookup("CompanhiaAerea");
-        C_Trechos interfaceTrechos = (C_Trechos) registryTrecho.lookup("CompanhiaAereaA");
-        ControllerUsuario controllerUsuario = new ControllerUsuario(interfaceUsuario);
-        ControllerTrechos controllerTrechos = new ControllerTrechos(interfaceTrechos);
-    }*/
     
     /**
      * @param args the command line arguments
@@ -50,7 +40,7 @@ public class Servidor implements Serializable {
             System.out.println("Digite sua porta de Companhia Aerea:");
             System.out.println("[Porta 1888] Companhia Aerea A - Regiões Norte e Nordeste.");
             System.out.println("[Porta 1889] Companhia Aerea B - Regiões Contro-Oeste.");
-            System.out.println("[Porta 1890] Companhia Aerea B - Regiões Sudeste e Sul.");
+            System.out.println("[Porta 1890] Companhia Aerea C - Regiões Sudeste e Sul.");
 
             do {
                 dados = bufferedReader.readLine();
@@ -60,7 +50,9 @@ public class Servidor implements Serializable {
 
             C_Usuario CU = new ControllerUsuario();
             ControllerUsuario C_CU = (ControllerUsuario) CU;
+            
             C_Trechos cTrechos = new ControllerTrechos(porta);
+            ControllerTrechos cTrecho = (ControllerTrechos)cTrechos;
             ArquivoEscritaLeitura2 arquivo = new ArquivoEscritaLeitura2(C_CU);
             arquivo.recuperar();
             Registry registry = LocateRegistry.createRegistry(porta);
@@ -70,10 +62,13 @@ public class Servidor implements Serializable {
             System.out.println("Servidor Iniciado");
             if (porta == 1888) {
                 companhia = "A";
+                cTrecho.setServidor("CompanhiaA");
             } else if (porta == 1889) {
                 companhia = "B";
+                 cTrecho.setServidor("CompanhiaB");
             } else {
                 companhia = "C";
+                 cTrecho.setServidor("CompanhiaC");
             }
             System.out.println("Você é a Companhia Aerea " + companhia);
             System.out.println("\n");

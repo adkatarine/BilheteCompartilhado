@@ -19,6 +19,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Passagem;
 import model.Trecho;
 import model.Usuario;
@@ -94,6 +96,63 @@ public class ClienteInterface {
         obj[1] = controllerTrechos;
         return obj;
     }
+    
+    
+    
+    
+    public static ArrayList<Trecho> finalizarCompra(Usuario usuario, ControllerTrechos c) throws RemoteException, IOException, FileNotFoundException, ClassNotFoundException{
+        if(!usuario.getPassagens().isEmpty()){
+            Passagem passagem = usuario.getPassagens().getLast();
+            if(!passagem.isStatusCompra()){
+                Iterator iterator = passagem.getTrechos().iterator();
+                ArrayList<Trecho> auxTrechos = new ArrayList();
+                
+                while(iterator.hasNext()){
+                    Trecho trecho = (Trecho) iterator.next();
+                    boolean auxB = false;
+                    try {
+                        auxB = comunicarServidor(trecho, c);
+                    } catch (NotBoundException ex) {
+                        Logger.getLogger(ControllerTrechos.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    if(!auxB){
+                        auxTrechos.add(trecho);
+                    }
+                } if(auxTrechos.isEmpty()){
+                    passagem.setStatusCompra(true);
+                    return null;
+                } else{
+                    return auxTrechos;
+                }
+            }
+        } return null;
+    }
+    
+    
+    private static boolean comunicarServidor(Trecho trecho, ControllerTrechos c) throws RemoteException, NotBoundException, IOException, FileNotFoundException, ClassNotFoundException{
+        Registry registry = null;
+        Registry registryTrecho = null;
+        if("CompanhiaB".equals(trecho.getID())){
+            return c.comprarTrechos(trecho);
+        } else{
+            if("CompanhiaA".equals(trecho.getID())){
+                registry = LocateRegistry.getRegistry(1888);
+                registryTrecho = LocateRegistry.getRegistry(1888); 
+            } else if("CompanhiaB".equals(trecho.getID())){
+                registry = LocateRegistry.getRegistry(1889);
+                registryTrecho = LocateRegistry.getRegistry(1889); 
+            } else{
+                registry = LocateRegistry.getRegistry(1890);
+                registryTrecho = LocateRegistry.getRegistry(1890); 
+            }
+            C_Usuario interfaceUsuario = (C_Usuario) registry.lookup("CompanhiaAerea");
+            C_Trechos interfaceTrechos = (C_Trechos) registryTrecho.lookup("CompanhiaAereaA");
+            ControllerUsuario controllerUsuario = new ControllerUsuario(interfaceUsuario);
+            ControllerTrechos controllerTrechos = new ControllerTrechos(interfaceTrechos);
+            return controllerTrechos.comprarTrechos(trecho);
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -203,7 +262,6 @@ public class ClienteInterface {
                         do{
                             System.out.println("Digite a opção que desejar: ");
                             System.out.println("[01] - Ver trechos.");
-                            //System.out.println("[02] - Voltar ao menu.");
                             System.out.println("[02] - Finalizar compra.");
                             dados = bufferedReader.readLine();
                             opcoesUsuario = Integer.parseInt(dados);
@@ -213,11 +271,27 @@ public class ClienteInterface {
                                 ArrayList<Trecho> arrayT = controllerTrechos.trechosDisponíveis();
                                 
                                 int i = 0;
+                                boolean boo = false;
                                 while(i < arrayT.size()){
                                     Trecho trecho = (Trecho) arrayT.get(i);
-                                    System.out.println(i+" - Partida: " + trecho.getLocalPartida() + "|| Chegada: "+ trecho.getLocalChegada());
-                                    i++;
+                                    if(!usuario.getPassagens().isEmpty()){
+                                        Iterator iterator = usuario.getPassagens().getLast().getTrechos().iterator();
+                                        while(iterator.hasNext()){
+                                            Trecho trechoAux = (Trecho) iterator.next();
+                                            if(trechoAux.getLocalPartida().equals(trecho.getLocalPartida()) && trechoAux.getLocalChegada().equals(trecho.getLocalChegada())){
+                                                boo = true;
+                                            }
+                                            if(!boo){
+                                                System.out.println(i+" - Partida: " + trecho.getLocalPartida() + " || Chegada: "+ trecho.getLocalChegada());
+                                            }  
+                                        } boo = false; i++;
+                                    } else{
+                                        System.out.println(i+" - Partida: " + trecho.getLocalPartida() + " || Chegada: "+ trecho.getLocalChegada());
+                                        i++;
+                                    }
+                                    
                                 }
+                                
                                 System.out.println("");
                                 System.out.println("Digite a opção que deseja comprar:");
                                 
@@ -231,6 +305,15 @@ public class ClienteInterface {
                                     }
                                 }while(porta <0 && porta>arrayT.size()+1);
                                 Trecho t = arrayT.get(porta);
+                                
+                                /*Iterator iterator = usuario.getPassagens().getLast().getTrechos().iterator();
+                                while(iterator.hasNext()){
+                                    Trecho trechinho = (Trecho) iterator.next();
+                                    if(trechinho.getLocalPartida().equals(t.getLocalPartida()) && trechinho.getLocalChegada().equals(t.getLocalChegada())){
+                                        
+                                    }
+                                }*/
+                                
                                 usuario.setPassagens(controllerTrechos.addTrecho(usuario, t).getPassagens());
                                 
                                 rAux = trocarServidor(t.getIDCOMPRA());
@@ -241,19 +324,65 @@ public class ClienteInterface {
                                 controllerUsuario = (ControllerUsuario)obj[0];
                                 controllerTrechos = (ControllerTrechos)obj[1];
                             } else{
-                                usuario.getPassagens().getLast().setStatusCompra(true);
-                                System.out.println("Sua compra foi finalizada com sucesso!");
-                                opcoesUsuario = 2;
-                            }
-                            System.out.println("PAROU AQUI");
+                                ArrayList<Trecho> auxTrechos = new ArrayList();
+                                //auxTrechos = controllerTrechos.finalizarCompra(usuario);
+                                auxTrechos = finalizarCompra(usuario, controllerTrechos);
+                                
+                                if(auxTrechos == null){
+                                    usuario.getPassagens().getLast().setStatusCompra(true);
+                                    controllerTrechos.confirmarCompra(usuario);
+                                    System.out.println("Sua compra foi finalizada com sucesso!");
+                                } else{
+                                    System.out.println("O(s) seguinte(s) bilhete(s) que você escolheu esgotou(aram) recentemente e "
+                                            + "sua compra foi finalizada com os bilhetes disponíveis.");
+                                    System.out.println("");
+                                    Iterator iterator = auxTrechos.iterator();
+                                    while(iterator.hasNext()){
+                                        Trecho trechoComprado = (Trecho) iterator.next();
+                                            System.out.println("TRECHO: " + trechoComprado.getLocalPartida() + " --> " + trechoComprado.getLocalChegada());
+                                    } System.out.println(""); System.out.println("");
+                                    
+                                    
+                                    for(int i = 0; i < auxTrechos.size(); i++){
+                                        usuario.getPassagens().getLast().getTrechos().remove(auxTrechos.get(i));
+                                    }
+                                    usuario.getPassagens().getLast().setStatusCompra(true);
+                                    controllerTrechos.confirmarCompra(usuario);
+                                    System.out.println("Sua compra foi finalizada com sucesso!");
+                                }
+                                    /*System.out.println("Sendo assim, você ainda gostaria de comprar os trechos disponíveis?");
+                                    System.out.println("[01] - Sim.");
+                                    System.out.println("[02] - Não.");
+                                    dados = bufferedReader.readLine();
+                                    opcoesUsuario = Integer.parseInt(dados);
+                                    if(opcoesUsuario == 01){
+                                        iterator = auxTrechos.iterator();
+                                        Iterator iteratorPassagem = usuario.getPassagens().getLast().getTrechos().iterator();
+                                        while(iteratorPassagem.hasNext()){
+                                            Trecho trechoUsuario = (Trecho) iteratorPassagem.next();
+                                            while(iterator.hasNext()){
+                                                Trecho trechoComprado = (Trecho) iterator.next();
+                                                if(trechoUsuario.equals(trechoComprado)){
+                                                    usuario.getPassagens().getLast().getTrechos().remove(trechoUsuario);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    usuario.getPassagens().getLast().setStatusCompra(true);
+                                    controllerTrechos.confirmarCompra(usuario);
+                                    System.out.println("Sua compra foi finalizada com sucesso!");
+                                    } else{
+                                        usuario.getPassagens().removeLast();
+                                        System.out.println("Sua compra foi cancelada com sucesso!");
+                                    }*/
+                                }
                         }while(opcoesUsuario==01); //DO WHILE que retorna para a opção de trechos ou menu.
                     } opcoesUsuario = 2;
-                    System.out.println("PAROU AQUI 2");
+
                 }while(opcoesUsuario == 2); //DO WHILE que retorna o usuário ao menu.
             //}while(opcoesUsuario == 4);
         } catch(RemoteException e){
             e.printStackTrace();
         }
     }
-    
 }
