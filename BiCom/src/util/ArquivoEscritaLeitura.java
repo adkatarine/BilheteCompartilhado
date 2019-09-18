@@ -15,11 +15,11 @@ import controller.*;
  * @author Daniel Costa
  * @author Adlla Katarine
  */
-public class ArquivoEscritaLeitura2 implements Serializable {
+public class ArquivoEscritaLeitura implements Serializable {
 
     private ControllerUsuario usuario;
 
-    public ArquivoEscritaLeitura2(ControllerUsuario usuario) {
+    public ArquivoEscritaLeitura(ControllerUsuario usuario) {
         this.usuario = usuario;
     }
 

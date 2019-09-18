@@ -50,45 +50,6 @@ public class ClienteInterface {
     }
 
     /**
-     * Conecta o usuário ao servidor escolhido por ele através do número da
-     * porta.
-     *
-     * @param porta
-     * @return Registry[]
-     * @throws RemoteException
-     */
-    public static Registry[] conectarServidores(int porta) throws RemoteException {
-        Registry registry = null;
-        Registry registryTrecho = null;
-        if (porta == 1888) {
-            try {
-                registry = LocateRegistry.getRegistry(porta);
-                registryTrecho = LocateRegistry.getRegistry(porta);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } else if (porta == 1889) {
-            try {
-                registry = LocateRegistry.getRegistry(porta);
-                registryTrecho = LocateRegistry.getRegistry(porta);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                registry = LocateRegistry.getRegistry(porta);
-                registryTrecho = LocateRegistry.getRegistry(porta);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        Registry[] r = new Registry[2];
-        r[0] = registry;
-        r[1] = registryTrecho;
-        return r;
-    }
-
-    /**
      * Retorna uma porta dependendo dos trechos comprados pelo usuário.
      *
      * @param companhia
@@ -346,7 +307,6 @@ public class ClienteInterface {
                                 Passagem passagem = (Passagem) iteratorP.next();
                                 if (passagem.isStatusCompra()) {
                                     System.out.println("************** " + aux + "ª PASSAGEM AEREA **************");
-                                    //iterator = usuario.getPassagens().getLast().getTrechos().iterator(); 
                                     iterator = passagem.getTrechos().iterator();
                                     System.out.println("");
                                     System.out.println("Nome: " + usuario.getNome());
@@ -421,8 +381,6 @@ public class ClienteInterface {
                             } while (porta < 0 && porta > arrayT.size());
                             Trecho t = arrayT.get(porta);
                             usuario = controllerTrechos.addTrecho(usuario, t);
-                            //usuario.setPassagens(controllerTrechos.addTrecho(usuario, t).getPassagens());
-                            //addTrecho(controllerTrechos.addTrecho(usuario, t), t);
                             obj = iniciarController(trocarServidor(t.getIDCOMPRA()));
                             controllerUsuario = (ControllerUsuario) obj[0];
                             controllerTrechos = (ControllerTrechos) obj[1];
